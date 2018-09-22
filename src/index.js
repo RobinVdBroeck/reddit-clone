@@ -1,6 +1,8 @@
 const express = require("express");
 const Knex = require("knex");
 const Redis = require("ioredis");
+const path = require("path");
+const bodyParser = require("body-parser");
 
 const config = {
   http: {
@@ -76,26 +78,24 @@ async function setupRedis() {
   const redis = new Redis({
     host: "redis"
   });
-
-  const counter = await redis.get("counter");
-  if (counter === null) {
-    redis.set("counter", 0);
-  }
-
   return redis;
 }
 
 Promise.all([setupDatabase(), setupRedis()])
-  .then(([knex, redis]) => {
+  .then(async ([knex, redis]) => {
+    console.log("Setting up the models");
+    const User = require("./data/user")(knex, redis);
+    await User.setup();
+
     console.log("Setting up express");
     const app = express();
+    app.use(bodyParser.json());
+    app.use(express.static(path.resolve(__dirname, "../static")));
+    app.set("views", path.resolve(__dirname, "../views"));
+    app.set("view engine", "pug");
 
-    app.get("/", async (req, res) => {
-      const counterString = await redis.get("counter");
-      const counter = Number.parseInt(counterString, 10);
-      res.send("There have been " + counter + " visitors before you");
-      redis.set("counter", counter + 1); // todo: solve this data race
-    });
+    console.log("Setting up the routes");
+    require("./routes/user")(User, app);
 
     app.listen(config.http.port, () => {
       console.log(`Listening on port ${config.http.port}`);

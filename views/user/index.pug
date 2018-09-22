@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible", content="ie=edge")
+        title Users
+    body
+        table(border="1px solid black")
+            thead
+                tr
+                    th #
+                    th UUID
+                    th Username
+                    th Email
+            tbody
+                - for(let i = 0; i < users.length; i++)
+                    - let user = users[i]
+                    tr
+                        td= i
+                        td= user.uuid
+                        td
+                            a(href=`/user/${user.uuid}`)= user.username
+                        td= user.email
+
+        div
+            p
+                label Username:
+                input(type="text", name="username", id="username")
+            p
+                label Email:
+                input(type="email", name="email", id="email")
+            p
+                input(type="submit", value="New user", onclick="submit()")
+
+        script(src="js/submit-user.js")

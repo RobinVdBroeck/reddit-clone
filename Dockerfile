@@ -3,7 +3,9 @@ WORKDIR /usr/src/reddit-clone
 
 COPY ["package.json", "yarn.lock", "/usr/src/reddit-clone/"]
 RUN yarn install --production
-COPY ["index.js", "src/", "/usr/src/reddit-clone/"]
+COPY views /usr/src/reddit-clone/views
+COPY static /usr/src/reddit-clone/static
+COPY src /usr/src/reddit-clone/src
 
 EXPOSE 8080
-CMD ["node", "index.js"]
+CMD ["node", "src/index.js"]
