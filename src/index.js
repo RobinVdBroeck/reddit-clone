@@ -3,6 +3,7 @@ const Knex = require("knex");
 const Redis = require("ioredis");
 const path = require("path");
 const bodyParser = require("body-parser");
+const UserRepository = require("./data/user");
 
 const config = {
   http: {
@@ -85,8 +86,8 @@ Promise.all([setupDatabase(), setupRedis()])
   .then(async ([knex, redis]) => {
     /* eslint-disable global-require */
     console.log("Setting up the models");
-    const User = require("./data/user")(knex, redis);
-    await User.setup();
+    const userRepository = new UserRepository(knex, redis);
+    await userRepository.setup();
 
     console.log("Setting up express");
     const app = express();
@@ -96,7 +97,8 @@ Promise.all([setupDatabase(), setupRedis()])
     app.set("view engine", "pug");
 
     console.log("Setting up the routes");
-    require("./routes/user")(User, app);
+    const userRoutes = require("./routes/user")(userRepository);
+    userRoutes.inject(app);
 
     app.listen(config.http.port, () => {
       console.log(`Listening on port ${config.http.port}`);

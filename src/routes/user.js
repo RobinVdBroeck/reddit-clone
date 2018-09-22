@@ -1,15 +1,30 @@
 /**
  *
- * @param {*} User User data layer access object
- * @param {*} App App object
+ * @param {*} UserData User data layer access object
  */
-function createUserRoutes(User, app) {
-  app.get("/user/:uuid", async (req, res) => {
+module.exports = UserData => ({
+  /**
+   * Inject the routes into the app object
+   * @param {} app Express app object
+   */
+  inject(app) {
+    app.get("/user/:uuid", this.getOne);
+    app.post("/user", this.createOne);
+    app.get("/users", this.getAll);
+  },
+
+  async getAll(req, res) {
+    const allUsers = await UserData.all();
+    res.render("user/index", {
+      users: allUsers
+    });
+  },
+  async getOne(req, res) {
     const { params } = req;
     const uuid = params.uuid || "d9ab4715-3cef-4d4b-92e6-a90a1d91f41f";
 
     try {
-      const user = await User.get(uuid);
+      const user = await UserData.get(uuid);
       if (typeof user === "undefined") {
         res.status(404);
       }
@@ -18,23 +33,13 @@ function createUserRoutes(User, app) {
       console.error(`Error while getting user with uuid ${uuid}`, e);
       res.status(500);
     }
-  });
-
-  app.get("/users", async (req, res) => {
-    const allUsers = await User.all();
-    res.render("user/index", {
-      users: allUsers
-    });
-  });
-
-  app.post("/user", async (req, res) => {
+  },
+  async createOne(req, res) {
     const user = req.body;
-    const uuid = await User.create(user);
+    const uuid = await UserData.create(user);
     res.json({
       ...user,
       uuid
     });
-  });
-}
-
-module.exports = createUserRoutes;
+  }
+});

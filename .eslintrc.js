@@ -1,7 +1,8 @@
 module.exports = {
   extends: ["airbnb-base", "plugin:prettier/recommended"],
   env: {
-    node: true
+    node: true,
+    mocha: true
   },
   rules: {
     "no-console": 0
