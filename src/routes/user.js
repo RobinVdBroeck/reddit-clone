@@ -1,8 +1,8 @@
 /**
  *
- * @param {*} UserData User data layer access object
+ * @param {*} UserRepository User data layer access object
  */
-module.exports = UserData => ({
+module.exports = UserRepository => ({
   /**
    * Inject the routes into the app object
    * @param {} app Express app object
@@ -14,7 +14,7 @@ module.exports = UserData => ({
   },
 
   async getAll(req, res) {
-    const allUsers = await UserData.all();
+    const allUsers = await UserRepository.all();
     res.render("user/index", {
       users: allUsers
     });
@@ -24,7 +24,7 @@ module.exports = UserData => ({
     const uuid = params.uuid || "d9ab4715-3cef-4d4b-92e6-a90a1d91f41f";
 
     try {
-      const user = await UserData.get(uuid);
+      const user = await UserRepository.get(uuid);
       if (typeof user === "undefined") {
         res.status(404);
       }
@@ -36,7 +36,7 @@ module.exports = UserData => ({
   },
   async createOne(req, res) {
     const user = req.body;
-    const uuid = await UserData.create(user);
+    const uuid = await UserRepository.create(user);
     res.json({
       ...user,
       uuid
