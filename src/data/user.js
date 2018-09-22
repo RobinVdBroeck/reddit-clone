@@ -4,9 +4,10 @@ const uuid = require("uuid/v4");
  * @param {*} knex The knex instance
  * @param {*} redis The redis instance
  */
-function user(knex, redis) {
+module.exports = (knex, redis) => {
   const tableName = "users";
   const allRedisKey = "all-users";
+
   return {
     /**
      * Create the tables
@@ -15,7 +16,7 @@ function user(knex, redis) {
     async setup() {
       const tableExists = await knex.schema.hasTable(tableName);
       if (!tableExists) {
-        console.log("Creating table for users with name " + tableName);
+        console.log(`Creating table for users with name ${tableName}`);
         await knex.schema.createTable(tableName, table => {
           table.string("uuid").primary();
           table.string("email").unique();
@@ -41,10 +42,10 @@ function user(knex, redis) {
 
     /**
      *
-     * @param {string} uuid  Id of the given user
+     * @param {string} id  Id of the given user
      */
-    async get(uuid) {
-      const cachedUser = await redis.get(uuid);
+    async get(id) {
+      const cachedUser = await redis.get(id);
       if (cachedUser !== null) {
         return JSON.parse(cachedUser);
       }
@@ -52,21 +53,21 @@ function user(knex, redis) {
         .from(tableName)
         .select("*")
         .where({
-          uuid
+          id
         });
 
       if (result.length === 0) {
         return undefined;
       }
 
-      try {
-        await redis.set(uuid, JSON.stringify(result[0]));
-        console.log(`Inserted user with uuid  ${uuid} in redis`);
-      } catch (e) {
-        console.error(`Could not set user with uuid ${uuid} in redis`);
-      } finally {
-        return result[0];
-      }
+      redis
+        .set(id, JSON.stringify(result[0]))
+        .then(() => console.log(`Inserted user with uuid  ${id} in redis`))
+        .catch(e =>
+          console.error(`Could not set user with uuid ${id} in redis`, e)
+        );
+
+      return result[0];
     },
 
     /**
@@ -75,17 +76,16 @@ function user(knex, redis) {
      * @returns {string} uuid of the newly created user
      */
     async create(user) {
-      user.uuid = uuid();
-
       // todo: fix constraints
       const result = await knex(tableName)
         .returning("uuid")
-        .insert(user);
+        .insert({
+          ...user,
+          id: uuid()
+        });
 
       redis.del(allRedisKey);
       return result[0];
     }
   };
-}
-
-module.exports = user;
+};

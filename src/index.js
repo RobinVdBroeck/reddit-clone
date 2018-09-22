@@ -55,9 +55,9 @@ function connectionLoop() {
       resolve(knex);
     } catch (e) {
       console.error("Could not get connection", e);
-      tries++;
-      if (tries == maxAmountOfTries) {
-        reject("Could not get connection");
+      tries += 1;
+      if (tries === maxAmountOfTries) {
+        reject(new Error("Could not get connection"));
         tries = 0;
       }
       timeout(connectionLoop, 1000);
@@ -83,6 +83,7 @@ async function setupRedis() {
 
 Promise.all([setupDatabase(), setupRedis()])
   .then(async ([knex, redis]) => {
+    /* eslint-disable global-require */
     console.log("Setting up the models");
     const User = require("./data/user")(knex, redis);
     await User.setup();
@@ -100,5 +101,6 @@ Promise.all([setupDatabase(), setupRedis()])
     app.listen(config.http.port, () => {
       console.log(`Listening on port ${config.http.port}`);
     });
+    /* eslint-enable global-require */
   })
   .catch(console.error);

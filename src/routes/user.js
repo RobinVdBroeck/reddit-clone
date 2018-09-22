@@ -1,5 +1,3 @@
-const bodyParser = require("body-parser");
-
 /**
  *
  * @param {*} User User data layer access object
@@ -7,7 +5,7 @@ const bodyParser = require("body-parser");
  */
 function createUserRoutes(User, app) {
   app.get("/user/:uuid", async (req, res) => {
-    const params = req.params;
+    const { params } = req;
     const uuid = params.uuid || "d9ab4715-3cef-4d4b-92e6-a90a1d91f41f";
 
     try {
@@ -17,7 +15,7 @@ function createUserRoutes(User, app) {
       }
       res.json(user);
     } catch (e) {
-      console.error("Error while getting user with uuid " + uuid, e);
+      console.error(`Error while getting user with uuid ${uuid}`, e);
       res.status(500);
     }
   });
