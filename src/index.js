@@ -1,7 +1,6 @@
 const express = require("express");
 const Knex = require("knex");
 const Redis = require("ioredis");
-const path = require("path");
 const bodyParser = require("body-parser");
 const UserRepository = require("./data/user");
 
@@ -92,9 +91,6 @@ Promise.all([setupDatabase(), setupRedis()])
     console.log("Setting up express");
     const app = express();
     app.use(bodyParser.json());
-    app.use(express.static(path.resolve(__dirname, "../static")));
-    app.set("views", path.resolve(__dirname, "../views"));
-    app.set("view engine", "pug");
 
     console.log("Setting up the routes");
     const userRoutes = require("./routes/user")(userRepository);

@@ -18,6 +18,38 @@ describe("User routes", () => {
     routes.inject(app);
   });
 
+  describe("getAll", () => {
+    const url = "/users";
+    it("should return an empty list when none in the database", () => {
+      userRepository.all = sinon.stub().returns([]);
+
+      return request(app)
+        .get(url)
+        .expect("Content-Type", /json/)
+        .expect(200)
+        .then(response => expect(response.body).to.eql([]));
+    });
+
+    it("should return an array with the users when there are users in the database", () => {
+      const users = [
+        {
+          username: "user#1"
+        },
+        {
+          username: "user#2"
+        }
+      ];
+
+      userRepository.all = sinon.stub().returns(users);
+
+      return request(app)
+        .get(url)
+        .expect("Content-type", /json/)
+        .expect(200)
+        .then(response => expect(response.body).to.eql(users));
+    });
+  });
+
   describe("getOne", () => {
     it("should return a 404 when none is found", done => {
       const id = uuid();
@@ -28,6 +60,7 @@ describe("User routes", () => {
         .get(`/user/${id}`)
         .expect(404, done);
     });
+
     it("should return the user when he's found", () => {
       const id = uuid();
       const user = {

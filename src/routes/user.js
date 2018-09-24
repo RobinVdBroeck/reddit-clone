@@ -14,10 +14,8 @@ module.exports = UserRepository => ({
   },
 
   async getAll(req, res) {
-    const allUsers = await UserRepository.all();
-    res.render("user/index", {
-      users: allUsers
-    });
+    const users = await UserRepository.all();
+    return res.json(users);
   },
   async getOne(req, res) {
     const { params } = req;
