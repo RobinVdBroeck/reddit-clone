@@ -22,7 +22,7 @@ module.exports = class UserRepository {
     if (!tableExists) {
       console.log(`Creating table for users with name ${tableName}`);
       await knex.schema.createTable(tableName, table => {
-        table.string("uuid").primary();
+        table.string("id").primary();
         table.string("email").unique();
         table.string("username").unique();
       });

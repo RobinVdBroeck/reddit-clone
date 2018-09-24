@@ -30,6 +30,7 @@ module.exports = UserRepository => ({
     } catch (e) {
       console.error(`Error while getting user with uuid ${uuid}`, e);
       res.status(500);
+      res.send();
     }
   },
   async createOne(req, res) {
