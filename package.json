@@ -1,13 +1,11 @@
 {
-  "name": "reddit-clone",
-  "version": "1.0.0",
   "private": true,
+  "repository": "git@gitlab.com:GamesMaxed/reddit-clone.git",
+  "author": "Robin Van den Broeck <robin.broeck@gmail.com>",
   "license": "MIT",
-  "scripts": {
-    "start": "node src/index.js",
-    "lint": "eslint src/**",
-    "test": "mocha src/**/*.spec.js"
-  },
+  "workspaces": [
+    "packages/*"
+  ],
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
@@ -19,26 +17,16 @@
       "git add"
     ]
   },
-  "dependencies": {
-    "body-parser": "^1.18.3",
-    "express": "^4.16.3",
-    "ioredis": "^4.0.0",
-    "knex": "^0.15.2",
-    "pg": "^7.4.3",
-    "uuid": "^3.3.2"
+  "scripts": {
+    "compile": "lerna run compile",
+    "clean": "lerna run clean",
+    "lint": "lerna run lint",
+    "test": "lerna run test"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
-    "eslint": "^5.3.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-config-prettier": "^3.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-prettier": "^2.6.2",
-    "husky": "^1.0.0-rc.14",
+    "husky": "^1.0.0",
+    "lerna": "^3.4.0",
     "lint-staged": "^7.3.0",
-    "mocha": "^5.2.0",
-    "prettier": "^1.14.3",
-    "sinon": "^6.3.4",
-    "supertest": "^3.3.0"
+    "prettier": "^1.14.3"
   }
 }
