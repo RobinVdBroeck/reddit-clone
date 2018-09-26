@@ -12,16 +12,15 @@
     }
   },
   "lint-staged": {
-    "*.{js,json,css,md}": [
+    "*.{js,json,css,md,yml,yaml}": [
       "prettier --write",
       "git add"
     ]
   },
   "scripts": {
-    "compile": "lerna run compile",
-    "clean": "lerna run clean",
-    "lint": "lerna run lint",
-    "test": "lerna run test"
+    "compile": "./node_modules/.bin/lerna run compile",
+    "lint": "./node_modules/.bin/lerna run lint",
+    "test": "./node_modules/.bin/lerna run test"
   },
   "devDependencies": {
     "husky": "^1.0.0",

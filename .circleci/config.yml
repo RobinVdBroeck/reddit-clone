@@ -1,0 +1,68 @@
+version: 2
+workflows:
+  version: 2
+  default:
+    jobs:
+      - checkout_code
+      - install:
+          requires:
+            - checkout_code
+      - lint:
+          requires:
+            - install
+      - test:
+          requires:
+            - install
+jobs:
+  checkout_code:
+    docker:
+      - image: circleci/node:8.12
+    working_directory: ~/reddit-clone
+    steps:
+      - checkout
+      - save_cache:
+          key: v1-repo{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/reddit-clone
+  install:
+    docker:
+      - image: circleci/node:8.12
+    working_directory: ~/reddit-clone
+    steps:
+      - restore_cache:
+          keys:
+            - v1-repo{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          keys:
+            - v1-node-dependencies-{{ checksum "yarn.lock" }}
+      - run: yarn install --pure-lockfile
+      - save_cache:
+          key: v1-node-dependencies-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+            - packages/back-end/node_modules
+            - packages/front-end/node_modules
+  lint:
+    docker:
+      - image: circleci/node:8.12
+    working_directory: ~/reddit-clone
+    steps:
+      - restore_cache:
+          keys:
+            - v1-repo{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          keys:
+            - v1-node-dependencies-{{ checksum "yarn.lock" }}
+      - run: yarn run lint
+  test:
+    docker:
+      - image: circleci/node:8.12
+    working_directory: ~/reddit-clone
+    steps:
+      - restore_cache:
+          keys:
+            - v1-repo{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          keys:
+            - v1-node-dependencies-{{ checksum "yarn.lock" }}
+      - run: yarn run test
